@@ -1,0 +1,16 @@
+Descriptor:
+  Name: ThreatFox by Abuse.ch
+  DisplayName: ThreatFox by Abuse.ch
+  Description: This tool is used for querying the ThreatFox database for indicators of compromise (IOCs) of type file hash in ThreatFox by Abuse.ch.
+  SupportedAuthTypes:
+    - ApiKey
+  Authorization:
+    Type: APIKey
+    Key: apiKey
+    Location: Header
+    AuthScheme: ''
+
+SkillGroups:
+  - Format: API
+    Settings:
+      OpenApiSpecUrl: https://github.com/csbadea/sec_copilot_plugins/blob/main/threatfox_search_hash_azure_function_openapi_3.yaml
