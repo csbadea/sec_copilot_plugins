@@ -1,0 +1,103 @@
+openapi: 3.0.0
+info:
+  title: ThreatFox API
+  description: API for querying the ThreatFox database for indicators of compromise (IOCs) associated with certain file hashes.
+  version: "1.0.0"
+servers:
+  - url: https://threatfox-api.abuse.ch/api/v1/
+paths:
+  /:
+    post:
+      summary: Search IOCs by Hash
+      description: Search the ThreatFox database for IOCs associated with a certain file hash (MD5 or SHA256).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+                - hash
+              properties:
+                query:
+                  type: string
+                  description: Selector for the query type. Must be "search_hash" for this operation.
+                  example: "search_hash"
+                hash:
+                  type: string
+                  description: The MD5 or SHA256 hash to search for.
+                  example: "2151c4b970eff0071948dbbc19066aa4"
+      responses:
+        '200':
+          description: Search results containing IOCs associated with the provided hash.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query_status:
+                    type: string
+                    example: "ok"
+                    description: Status of the search query.
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        ioc:
+                          type: string
+                          description: "Indicator of Compromise URL."
+                        threat_type:
+                          type: string
+                          description: "Type of threat identified."
+                        threat_type_desc:
+                          type: string
+                          description: "Description of the threat type."
+                        ioc_type:
+                          type: string
+                          description: "Type of IOC."
+                        ioc_type_desc:
+                          type: string
+                          description: "Description of the IOC type."
+                        malware:
+                          type: string
+                          description: "Malware associated with the IOC."
+                        malware_printable:
+                          type: string
+                          description: "Human-readable malware name."
+                        malware_alias:
+                          type: string
+                          description: "Known aliases of the malware."
+                        malware_malpedia:
+                          type: string
+                          description: "Link to Malpedia entry for the malware."
+                        confidence_level:
+                          type: integer
+                          format: int32
+                          description: "Confidence level in the threat association."
+                        first_seen:
+                          type: string
+                          format: date-time
+                          description: "Timestamp of first sighting."
+                        last_seen:
+                          type: string
+                          format: date-time
+                          description: "Timestamp of last sighting. Could be null."
+                        reference:
+                          type: string
+                          description: "Reference link for the threat information. Could be null."
+                        reporter:
+                          type: string
+                          description: "Reporter of the IOC."
+                        tags:
+                          type: array
+                          items:
+                            type: string
+                          description: "Tags associated with the IOC."
+        '400':
+          description: Bad Request (e.g., missing required parameters or invalid hash format).
+        '500':
+          description: Internal Server Error indicating a problem with the server.
