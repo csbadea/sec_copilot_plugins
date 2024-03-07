@@ -1,0 +1,85 @@
+openapi: 3.0.0
+info:
+  title: ThreatFox Hash Query Function
+  description: Azure Function that queries the ThreatFox API for IOCs related to a specific hash.
+  version: 1.0.0
+servers:
+  - url: https://copilot-dc-threatfox.azurewebsites.net/api
+    description: Production server
+paths:
+  /thf_search_hash:
+    post:
+      summary: Query IOCs by Hash
+      operationId: queryIOCsByHash
+      tags:
+        - ThreatFox Hash Query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - hash
+              properties:
+                hash:
+                  type: string
+                  description: MD5 or SHA256 hash to query for related IOCs.
+                  example: "2151c4b970eff0071948dbbc19066aa4"
+      responses:
+        '200':
+          description: Successfully retrieved IOCs related to the provided hash.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreatFoxResponse'
+        '400':
+          description: Bad request, possibly due to missing hash in the request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Please provide a hash in the request body."
+        '500':
+          description: Internal server error, possibly due to issues querying the ThreatFox API.
+components:
+  schemas:
+    ThreatFoxResponse:
+      type: object
+      properties:
+        query_status:
+          type: string
+          example: "ok"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IOCEntry'
+    IOCEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        ioc:
+          type: string
+        threat_type:
+          type: string
+        ioc_type:
+          type: string
+        malware:
+          type: string
+        confidence_level:
+          type: integer
+        first_seen:
+          type: string
+        last_seen:
+          type: string
+          nullable: true
+        reporter:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
